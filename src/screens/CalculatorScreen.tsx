@@ -12,7 +12,37 @@ export const CalculatorScreen = () => {
   };
 
   const buildNumber = (textnumber: string) => {
-    setResult(result + textnumber);
+    //validation ..
+    if (result.includes('.') && textnumber === '.') return;
+
+    if (result.startsWith('0') || result.startsWith('-0')) {
+      // .
+      if (textnumber === '.') {
+        setResult(result + textnumber);
+
+        // evaluate if there is a 0 and a .
+      } else if (textnumber === '0' && result.includes('.')) {
+        setResult(result + textnumber);
+
+        // evaluate if its different from 0 and it has a .
+      } else if (textnumber !== '0' && !result.includes('.')) {
+        setResult(textnumber);
+
+        // avoid 000.00
+      } else if (textnumber === '0' && !result.includes('.')) {
+        setResult(result);
+      }
+    } else {
+      setResult(result + textnumber);
+    }
+  };
+
+  const positiveNegative = () => {
+    if (result.includes('-')) {
+      setResult(result.replace('-', ''));
+    } else {
+      setResult('-' + result);
+    }
   };
 
   return (
@@ -25,7 +55,7 @@ export const CalculatorScreen = () => {
       {/* Button Row */}
       <View style={styles.row}>
         <ButtonCalc text="C" color="#9B9B9B" action={clean} />
-        <ButtonCalc text="+/-" color="#9B9B9B" action={clean} />
+        <ButtonCalc text="+/-" color="#9B9B9B" action={positiveNegative} />
         <ButtonCalc text="del" color="#9B9B9B" action={clean} />
         <ButtonCalc text="/" color="#FF9427" action={clean} />
       </View>
