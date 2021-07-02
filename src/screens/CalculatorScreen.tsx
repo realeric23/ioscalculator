@@ -1,14 +1,24 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Text, View} from 'react-native';
 import {ButtonCalc} from '../components/ButtonCalc';
 import {styles} from '../theme/AppTheme';
+
+enum Operators {
+  add,
+  substract,
+  multiply,
+  divide,
+}
 
 export const CalculatorScreen = () => {
   const [result, setResult] = useState('0');
   const [previousResult, setPreviousResult] = useState('0');
 
+  const lastOperation = useRef<Operators>();
+
   const clean = () => {
     setResult('0');
+    setPreviousResult('0');
   };
 
   const buildNumber = (textnumber: string) => {
@@ -45,9 +55,56 @@ export const CalculatorScreen = () => {
     }
   };
 
+  const btnDelete = () => {
+    let negative = '';
+    let tempNum = result;
+    if (result.includes('-')) {
+      negative = '-';
+      tempNum = result.substr(1);
+    }
+
+    if (tempNum.length > 1) {
+      setResult(negative + tempNum.slice(0, -1));
+    } else {
+      setResult('0');
+    }
+  };
+
+  const changePreNum = () => {
+    if (result.endsWith('.')) {
+      setPreviousResult(result.slice(0, -1));
+    } else {
+      setPreviousResult(result);
+    }
+    setResult('0');
+  };
+
+  const divideButton = () => {
+    changePreNum();
+    lastOperation.current = Operators.divide;
+  };
+
+  const multiplyButton = () => {
+    changePreNum();
+    lastOperation.current = Operators.multiply;
+  };
+
+  const substractButton = () => {
+    changePreNum();
+    lastOperation.current = Operators.substract;
+  };
+
+  const addButton = () => {
+    changePreNum();
+    lastOperation.current = Operators.add;
+  };
+
   return (
     <View style={styles.calculatorContainer}>
-      <Text style={styles.smallResult}>{previousResult}</Text>
+      {previousResult !== '0' && (
+        <Text style={styles.smallResult}>{previousResult}</Text>
+      )}
+
       <Text style={styles.result} numberOfLines={1} adjustsFontSizeToFit>
         {result}
       </Text>
@@ -56,8 +113,8 @@ export const CalculatorScreen = () => {
       <View style={styles.row}>
         <ButtonCalc text="C" color="#9B9B9B" action={clean} />
         <ButtonCalc text="+/-" color="#9B9B9B" action={positiveNegative} />
-        <ButtonCalc text="del" color="#9B9B9B" action={clean} />
-        <ButtonCalc text="/" color="#FF9427" action={clean} />
+        <ButtonCalc text="del" color="#9B9B9B" action={btnDelete} />
+        <ButtonCalc text="/" color="#FF9427" action={divideButton} />
       </View>
 
       {/* Button Row */}
@@ -65,7 +122,7 @@ export const CalculatorScreen = () => {
         <ButtonCalc text="7" action={buildNumber} />
         <ButtonCalc text="8" action={buildNumber} />
         <ButtonCalc text="9" action={buildNumber} />
-        <ButtonCalc text="X" color="#FF9427" action={clean} />
+        <ButtonCalc text="X" color="#FF9427" action={multiplyButton} />
       </View>
 
       {/* Button Row */}
@@ -73,7 +130,7 @@ export const CalculatorScreen = () => {
         <ButtonCalc text="4" action={buildNumber} />
         <ButtonCalc text="5" action={buildNumber} />
         <ButtonCalc text="6" action={buildNumber} />
-        <ButtonCalc text="-" color="#FF9427" action={clean} />
+        <ButtonCalc text="-" color="#FF9427" action={substractButton} />
       </View>
 
       {/* Button Row */}
@@ -81,7 +138,7 @@ export const CalculatorScreen = () => {
         <ButtonCalc text="1" action={buildNumber} />
         <ButtonCalc text="2" action={buildNumber} />
         <ButtonCalc text="3" action={buildNumber} />
-        <ButtonCalc text="+" color="#FF9427" action={clean} />
+        <ButtonCalc text="+" color="#FF9427" action={addButton} />
       </View>
 
       {/* Button Row */}
