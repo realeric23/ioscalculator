@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
     color: 'white',
     fontSize: 60,
     textAlign: 'right',
+    marginBottom: 10,
   },
   smallResult: {
     color: 'rgba(255,255,2555, 0.5)',
